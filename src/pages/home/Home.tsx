@@ -1,34 +1,59 @@
 import { Canvas } from '@react-three/fiber'
 import './Home.scss'
 import Sun from '../../components/sun/Sun'
-import { OrbitControls } from '@react-three/drei'
-import Earth from '../../components/earth/Earth'
+// import { OrbitControls} from '@react-three/drei'
 import { Stars } from '@react-three/drei'
+import PlanetSystem from '../../components/PlanetSystem'
+import { useState } from 'react'
+import CameraController from '../../components/scene/CameraController'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import PlanetInfoPanel from '../../components/planets/PlanetInfoPanel'
 
 export default function Home() {
+
+    const [selectedPlanet, setSelectedPlanet] =
+        useState<string | null>(null);
+
     return (
         <div className="main-container">
             <Canvas
                 className="three-d-canvas"
-                camera={{ position: [0, 2, 7] }}
+                camera={{ position: [10, 10, 35] }}
+                onPointerMissed={() =>
+                    setSelectedPlanet(null)
+                }
             >
-                <ambientLight intensity={1} />
+                <ambientLight intensity={0.3} />
+                <pointLight
+                    position={[0, 0, 0]}
+                    intensity={400}
+                />
+                <EffectComposer>
+                    <Bloom
+                        intensity={1.5}
+                        luminanceThreshold={0.2}
+                    />
+                </EffectComposer>
+                {/* <OrbitControls
+                    enableZoom={false}                
+                /> */}
                 <Sun />
-                <Earth />
-                <OrbitControls/>
+                <PlanetSystem
+                    selectedPlanet={selectedPlanet}
+                    setSelectedPlanet={setSelectedPlanet}
+                />
                 <Stars
-                    radius={300}   // how far stars spread
-                    depth={10}     // star field depth
-                    count={5000}   // number of stars
-                    factor={5}     // size factor
-                    saturation={0} // color saturation
+                    depth={50}
+                    count={5000}
+                    factor={2}
+                    saturation={1}
                     fade={true}
                 />
             </Canvas>
-
-            <div className="details-section">
-                This is the details section
-            </div>
+            <PlanetInfoPanel
+                selectedPlanet={selectedPlanet}
+                setSelectedPlanet={setSelectedPlanet}
+            />
         </div>
     )
 }
